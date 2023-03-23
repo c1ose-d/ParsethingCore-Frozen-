@@ -5,6 +5,8 @@ internal class Program
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0060:Remove unused parameter", Justification = "<Pending>")]
     public static void Main(string[] args)
     {
+        TraceFile.Set();
+
         while (true)
         {
             Sources sources = new();
@@ -27,12 +29,8 @@ internal class Program
                             try
                             {
                                 _ = db.Procurements.Add(procurement);
-                                Console.WriteLine("Add new Procurement");
                             }
-                            catch
-                            {
-                                Debug.WriteLine(procurement.ToString());
-                            }
+                            catch { }
                         }
                         else
                         {
@@ -50,8 +48,8 @@ internal class Program
                             def.Enforcement = procurement.Enforcement;
                             def.Warranty = procurement.Warranty;
                             _ = db.Procurements.Update(def);
-                            Console.WriteLine("Update Procurement");
                         }
+                        Trace.WriteLine(procurement.ToString());
                         _ = db.SaveChanges();
                     }
                 }
@@ -67,20 +65,36 @@ internal class Program
         {
             procurement.LawId = GetIdTo.Law(source.Law);
         }
+        else
+        {
+            procurement.LawId = null;
+        }
         procurement.Law = null;
         if (source.Method != null)
         {
             procurement.MethodId = GetIdTo.Method(source.Method);
+        }
+        else
+        {
+            procurement.MethodId = null;
         }
         procurement.Method = null;
         if (source.Platform != null)
         {
             procurement.PlatformId = GetIdTo.Platform(source.Platform);
         }
+        else
+        {
+            procurement.PlatformId = null;
+        }
         procurement.Platform = null;
         if (source.Organization != null)
         {
             procurement.OrganizationId = GetIdTo.Organization(source.Organization);
+        }
+        else
+        {
+            procurement.OrganizationId = null;
         }
         procurement.Organization = null;
         if (source.TimeZone != null)

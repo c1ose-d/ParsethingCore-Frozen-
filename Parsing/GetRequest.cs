@@ -1,30 +1,31 @@
-﻿namespace Parsing;
+﻿using System.Diagnostics;
+
+namespace Parsing;
 
 public class GetRequest
 {
     public GetRequest(string requestUri)
     {
         RequestUri = requestUri;
-    }
+        HttpClient = new HttpClient()
+        {
+            Timeout = TimeSpan.FromSeconds(5)
+        };
 
-    public string RequestUri { get; set; } = null!;
-    private byte[]? Bytes { get; set; }
-    public string Input { get; set; } = string.Empty;
-    public void Returns()
-    {
-        using HttpClient httpClient = new();
         try
         {
-            Bytes = httpClient.GetByteArrayAsync(RequestUri).Result;
-            Console.WriteLine($"GET Request from {RequestUri} was successfully");
+            HttpClient.Send(new HttpRequestMessage(HttpMethod.Patch, RequestUri));
+            Input = HttpClient.GetStringAsync(RequestUri).Result;
+            Trace.WriteLine($"{DateTime.Now}\n{RequestUri}\nIs complited successfully.\n");
         }
-        catch
+        catch (Exception e)
         {
-            Console.WriteLine($"GET Request from {RequestUri} was unsuccessfully");
+            Trace.WriteLine($"{DateTime.Now}\n{RequestUri}\n{e.InnerException?.Message}\n");
         }
-        if (Bytes != null)
-        {
-            Input = Encoding.UTF8.GetString(Bytes);
-        }
+        HttpClient.Dispose();
     }
+
+    private string RequestUri { get; set; } = null!;
+    private HttpClient HttpClient { get; set; }
+    public string Input { get; set; } = string.Empty;
 }

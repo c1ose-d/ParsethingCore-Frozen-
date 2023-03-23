@@ -18,7 +18,7 @@ public partial class ParsethingContext : DbContext
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
-        _ = optionsBuilder.UseSqlServer("Integrated Security=SSPI;Persist Security Info=False;Initial Catalog=Parsething;Data Source=DESKTOP-SGD0ON5\\SQLEXPRESS;Trust Server Certificate = true");
+        _ = optionsBuilder.UseSqlServer("Password=Voice49:dusk;Persist Security Info=True;User ID=denzelcrocker;Initial Catalog=Parsething;Data Source=176.112.98.217, 1433;Trust Server Certificate=True");
     }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)

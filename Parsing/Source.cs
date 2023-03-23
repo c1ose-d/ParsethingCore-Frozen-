@@ -1,4 +1,6 @@
-﻿namespace Parsing;
+﻿using System.Diagnostics;
+
+namespace Parsing;
 
 public class Source : Procurement
 {
@@ -34,13 +36,13 @@ public class Source : Procurement
             Securing = new GetSecuring().Result;
             Enforcement = new GetEnforcement().Result;
             Warranty = new GetWarranty().Result;
+            Trace.WriteLine("Create Source");
         }
     }
 
     private void Request()
     {
         GetRequest request = new(RequestUri);
-        request.Returns();
         Input = request.Input;
     }
 
@@ -120,7 +122,7 @@ public class Source : Procurement
 
     private class GetInitialPrice : Parse
     {
-        public override List<Regex> Regexes { get; } = new() { new(@"Максимальное значение цены контракта\n *</(?<space>.*?)>\n *<(?<space>.*?)>\n *(?<val>.*?)\n", RegexOptions), new(@"Начальная \(максимальная\) цена контракта\n *</(?<space>.*?)>\n *<(?<space>.*?)>\n *(?<val>.*?)\n", RegexOptions) };
+        public override List<Regex> Regexes { get; } = new() { new(@"Максимальное значение цены контракта\n *</(?<space>.*?)>\n *<(?<space>.*?)>\n *(?<val>.*?)\n", RegexOptions), new(@"Начальная \(максимальная\) цена контракта\n *</(?<space>.*?)>\n *<(?<space>.*?)>\n *(?<val>.*?)\n", RegexOptions), new(@"Начальная цена</(?<space>.*?)>\n *<(?<space>.*?)>\n *(?<val>.*?)&nbsp;", RegexOptions) };
         public GetInitialPrice() : base(Input) { }
     }
 
@@ -144,6 +146,6 @@ public class Source : Procurement
 
     public override string ToString()
     {
-        return $"{RequestUri}\n{Number}\n{Object}\n{Location}\n{TimeZone.Offset}\n{InitialPrice}";
+        return $"{RequestUri}\n{Number}\n{Object}\n{Location}\n{TimeZone?.Offset}\n{InitialPrice}";
     }
 }
