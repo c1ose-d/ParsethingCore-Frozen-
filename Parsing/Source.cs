@@ -1,68 +1,85 @@
-﻿using System.Diagnostics;
+﻿using Database.Entities;
 
 namespace Parsing;
 
 public class Source : Procurement
 {
-    public Source(string requestUri)
+    public Source(string procurementCard)
     {
-        RequestUri = requestUri;
-        Request();
-        if (Input != string.Empty)
-        {
-            Number = new GetNumber().Result;
-            Law = new() { Number = new GetLawNumber().Result };
-            Method = new() { Text = new GetMethodText().Result };
-            Platform = new() { Name = new GetPlatformName().Result, Address = new GetPlatformAddress().Result };
-            Organization = new() { Name = new GetOrganizationName().Result, PostalAddress = new GetOrganizationPostalAddress().Result };
-            Object = new GetObject().Result;
-            Location = new GetLocation().Result;
-            try
-            {
-                StartDate = Convert.ToDateTime(new GetStartDate().Result);
-            }
-            catch { }
-            try
-            {
-                Deadline = Convert.ToDateTime(new GetDeadline().Result);
-            }
-            catch { }
-            TimeZone = new() { Offset = new GetTimeZoneOffset().Result };
-            try
-            {
-                InitialPrice = Convert.ToDecimal(new GetInitialPrice().Result);
-            }
-            catch { }
-            Securing = new GetSecuring().Result;
-            Enforcement = new GetEnforcement().Result;
-            Warranty = new GetWarranty().Result;
-            Trace.WriteLine("Create Source");
-        }
+        ProcurementCard = procurementCard;
+        Initialize();
     }
 
-    private void Request()
+    public static string ProcurementCard { get; set; } = null!;
+    public static string Input { get; set; } = null!;
+
+    private void Initialize()
+    {
+        RequestUri = $"https://zakupki.gov.ru/epz/order/notice{new GetRequestUri().Result}";
+        Number = new GetNumber().Result;
+        ProcurementSourceStatе = new() { Kind = new GetProcurementSourceStateKind().Result };
+        Law = new() { Number = new GetLawNumber().Result };
+        Object = new GetObject().Result;
+        InitialPrice = Convert.ToDecimal(new GetInitialPrice().Result);
+        Organization = new() { Name = new GetOrganizationName().Result };
+    }
+
+    public void GetInnerObjects()
+    {
+        GetInput();
+    }
+
+    private void GetInput()
     {
         GetRequest request = new(RequestUri);
         Input = request.Input;
     }
 
-    public static string Input { get; set; } = null!;
+    private class GetRequestUri : Parse
+    {
+        public override List<Regex> Regexes { get; } = new() { new(@"<a target=""_blank"" href=""/epz/order/notice(?<val>.*?)"">", RegexOptions) };
+        public GetRequestUri() : base(ProcurementCard) { }
+    }
 
     private class GetNumber : Parse
     {
-        public override List<Regex> Regexes { get; } = new() { new(@">№ (?<val>.*?)<", RegexOptions) };
-        public GetNumber() : base(Input) { }
+        public override List<Regex> Regexes { get; } = new() { new(@"№ (?<val>.*?)\n", RegexOptions) };
+        public GetNumber() : base(ProcurementCard) { }
+    }
+
+    private class GetProcurementSourceStateKind : Parse
+    {
+        public override List<Regex> Regexes { get; } = new() { new(@"<div class=""registry-entry__header-mid__title text-normal"">(?<val>.*?)</div>", RegexOptions) };
+        public GetProcurementSourceStateKind() : base(ProcurementCard) { }
     }
 
     private class GetLawNumber : Parse
     {
-        public override List<Regex> Regexes { get; } = new() { new(@"<div class=""cardMainInfo__title d-flex text-truncate""\n(?<space>.*?)\n(?<space>.*?)>(?<val>.*?)\n(?<space>.*?)</div>", RegexOptions), new(@"<div class=""registry-entry__header-top__title"">\n *(?<val>.*?) ", RegexOptions) };
-        public GetLawNumber() : base(Input) { }
+        public override List<Regex> Regexes { get; } = new() { new(@"<div class=""col-9 p-0 registry-entry__header-top__title text-truncate""(?<space>.*?)>\n *(?<val>.*?)\n", RegexOptions) };
+        public GetLawNumber() : base(ProcurementCard) { }
+    }
+
+    private class GetObject : Parse
+    {
+        public override List<Regex> Regexes { get; } = new() { new(@"Объект закупки</(?<space>.*?)>\n(?<space>.*?)>(?<val>.*?)<", RegexOptions) };
+        public GetObject() : base(ProcurementCard) { }
+    }
+
+    private class GetInitialPrice : Parse
+    {
+        public override List<Regex> Regexes { get; } = new() { new(@"Начальная цена(?<space>.*?)value"">(?<val>.*,..?) ", RegexOptions) };
+        public GetInitialPrice() : base(ProcurementCard) { }
+    }
+
+    private class GetOrganizationName : Parse
+    {
+        public override List<Regex> Regexes { get; } = new() { new(@"href=""/epz/organization/view/(?<space>.*?)>\n *(?<val>.*?)\n", RegexOptions) };
+        public GetOrganizationName() : base(ProcurementCard) { }
     }
 
     private class GetMethodText : Parse
     {
-        public override List<Regex> Regexes { get; } = new() { new(@"Способ определения поставщика \(подрядчика, исполнителя\)</(?<space>.*?)>\n *<(?<space>.*?)>(?<val>.*?)</(?<space>.*?)>\n", RegexOptions), new(@"Способ(?<space>.*?)\n(?<space>.*?)info"">(?<val>.*?)<", RegexOptions), new(@"Способ(?<space>.*?)\n(?<space>.*?)\n *(?<val>.*?)\n", RegexOptions) };
+        public override List<Regex> Regexes { get; } = new() { new(@"<div class=""col-9 p-0 registry-entry__header-top__title text-truncate""(?<space>.*?)>\n *(?<space>.*?)\n *(?<val>.*?)\n", RegexOptions) };
         public GetMethodText() : base(Input) { }
     }
 
@@ -78,22 +95,10 @@ public class Source : Procurement
         public GetPlatformAddress() : base(Input) { }
     }
 
-    private class GetOrganizationName : Parse
-    {
-        public override List<Regex> Regexes { get; } = new() { new(@"<a href=""(?<space>.*?)epz/organization/view(?<space>.*?)>\s*(?<val>.*?)\s*<", RegexOptions), new(@"<a href=""(?<space>.*?)epz/organization/view(?<space>.*?)>(?<val>.*?)<", RegexOptions), new(@"padding"">(?<space>.*?)<a href=""(?<space>.*?)epz/organization/view(?<space>.*?)>(?<val>.*?)</a>", RegexOptions) };
-        public GetOrganizationName() : base(Input) { }
-    }
-
     private class GetOrganizationPostalAddress : Parse
     {
         public override List<Regex> Regexes { get; } = new() { new(@"Почтовый адрес(?<space>.*?)>\n(?<space>.*?)\n *(?<val>.*?)\n", RegexOptions) };
         public GetOrganizationPostalAddress() : base(Input) { }
-    }
-
-    private class GetObject : Parse
-    {
-        public override List<Regex> Regexes { get; } = new() { new(@"Объект закупки</span>\n(?<space>.*?)>(?<val>.*?)<", RegexOptions), new(@"Объект закупки</div>\n(?<space>.*?)\n *(?<val>.*?)\n", RegexOptions) };
-        public GetObject() : base(Input) { }
     }
 
     private class GetLocation : Parse
@@ -118,12 +123,6 @@ public class Source : Procurement
     {
         public override List<Regex> Regexes { get; } = new() { new(@" (?<val>МСК.*?) ", RegexOptions) };
         public GetTimeZoneOffset() : base(Input) { }
-    }
-
-    private class GetInitialPrice : Parse
-    {
-        public override List<Regex> Regexes { get; } = new() { new(@"Максимальное значение цены контракта\n *</(?<space>.*?)>\n *<(?<space>.*?)>\n *(?<val>.*?)\n", RegexOptions), new(@"Начальная \(максимальная\) цена контракта\n *</(?<space>.*?)>\n *<(?<space>.*?)>\n *(?<val>.*?)\n", RegexOptions), new(@"Начальная цена</(?<space>.*?)>\n *<(?<space>.*?)>\n *(?<val>.*?)&nbsp;", RegexOptions) };
-        public GetInitialPrice() : base(Input) { }
     }
 
     private class GetSecuring : Parse

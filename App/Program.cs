@@ -1,4 +1,6 @@
-﻿namespace App;
+﻿using Database.Entities;
+
+namespace App;
 
 internal class Program
 {
@@ -7,55 +9,61 @@ internal class Program
     {
         TraceFile.Set();
 
-        while (true)
+        Sources sources = new();
+        foreach(Source source in sources)
         {
-            Sources sources = new();
-            foreach (Source source in sources)
-            {
-                try
-                {
-                    ParsethingContext db = new();
-                    if (source.Number != string.Empty)
-                    {
-                        Procurement procurement = SetProcurement(source);
-                        Procurement? def = null;
-                        try
-                        {
-                            def = db.Procurements.Where(p => p.Number == procurement.Number).First();
-                        }
-                        catch { }
-                        if (def == null)
-                        {
-                            try
-                            {
-                                _ = db.Procurements.Add(procurement);
-                            }
-                            catch { }
-                        }
-                        else
-                        {
-                            def.LawId = procurement.LawId;
-                            def.MethodId = procurement.MethodId;
-                            def.PlatformId = procurement.PlatformId;
-                            def.OrganizationId = procurement.OrganizationId;
-                            def.Object = procurement.Object;
-                            def.Location = procurement.Location;
-                            def.StartDate = procurement.StartDate;
-                            def.Deadline = procurement.Deadline;
-                            def.TimeZoneId = procurement.TimeZoneId;
-                            def.InitialPrice = procurement.InitialPrice;
-                            def.Securing = procurement.Securing;
-                            def.Enforcement = procurement.Enforcement;
-                            def.Warranty = procurement.Warranty;
-                            _ = db.Procurements.Update(def);
-                        }
-                        Trace.WriteLine(procurement.ToString());
-                        _ = db.SaveChanges();
-                    }
-                }
-                catch { }
-            }
+            Console.WriteLine($"{source.RequestUri}\n{source.Number}\n{source.Law?.Number}\n{source.ProcurementSourceStatе?.Kind}\n{source.Object}\n{source.InitialPrice}\n{source.Organization.Name}\n");
         }
+
+        //while (true)
+        //{
+        //    Sources sources = new();
+        //    foreach (Source source in sources)
+        //    {
+        //        try
+        //        {
+        //            ParsethingContext db = new();
+        //            if (source.Number != string.Empty)
+        //            {
+        //                Procurement procurement = SetProcurement(source);
+        //                Procurement? def = null;
+        //                try
+        //                {
+        //                    def = db.Procurements.Where(p => p.Number == procurement.Number).First();
+        //                }
+        //                catch { }
+        //                if (def == null)
+        //                {
+        //                    try
+        //                    {
+        //                        _ = db.Procurements.Add(procurement);
+        //                    }
+        //                    catch { }
+        //                }
+        //                else
+        //                {
+        //                    def.LawId = procurement.LawId;
+        //                    def.MethodId = procurement.MethodId;
+        //                    def.PlatformId = procurement.PlatformId;
+        //                    def.OrganizationId = procurement.OrganizationId;
+        //                    def.Object = procurement.Object;
+        //                    def.Location = procurement.Location;
+        //                    def.StartDate = procurement.StartDate;
+        //                    def.Deadline = procurement.Deadline;
+        //                    def.TimeZoneId = procurement.TimeZoneId;
+        //                    def.InitialPrice = procurement.InitialPrice;
+        //                    def.Securing = procurement.Securing;
+        //                    def.Enforcement = procurement.Enforcement;
+        //                    def.Warranty = procurement.Warranty;
+        //                    _ = db.Procurements.Update(def);
+        //                }
+        //                Trace.WriteLine(procurement.ToString());
+        //                _ = db.SaveChanges();
+        //            }
+        //        }
+        //        catch { }
+        //    }
+        //}
     }
 
     private static Procurement SetProcurement(Procurement source)
@@ -64,10 +72,6 @@ internal class Program
         if (source.Law != null)
         {
             procurement.LawId = GetIdTo.Law(source.Law);
-        }
-        else
-        {
-            procurement.LawId = null;
         }
         procurement.Law = null;
         if (source.Method != null)
@@ -91,10 +95,6 @@ internal class Program
         if (source.Organization != null)
         {
             procurement.OrganizationId = GetIdTo.Organization(source.Organization);
-        }
-        else
-        {
-            procurement.OrganizationId = null;
         }
         procurement.Organization = null;
         if (source.TimeZone != null)

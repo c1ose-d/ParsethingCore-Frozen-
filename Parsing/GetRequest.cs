@@ -1,6 +1,4 @@
-﻿using System.Diagnostics;
-
-namespace Parsing;
+﻿namespace Parsing;
 
 public class GetRequest
 {
@@ -9,12 +7,11 @@ public class GetRequest
         RequestUri = requestUri;
         HttpClient = new HttpClient()
         {
-            Timeout = TimeSpan.FromSeconds(5)
+            Timeout = TimeSpan.FromSeconds(10)
         };
 
         try
         {
-            HttpClient.Send(new HttpRequestMessage(HttpMethod.Patch, RequestUri));
             Input = HttpClient.GetStringAsync(RequestUri).Result;
             Trace.WriteLine($"{DateTime.Now}\n{RequestUri}\nIs complited successfully.\n");
         }
@@ -22,6 +19,7 @@ public class GetRequest
         {
             Trace.WriteLine($"{DateTime.Now}\n{RequestUri}\n{e.InnerException?.Message}\n");
         }
+
         HttpClient.Dispose();
     }
 

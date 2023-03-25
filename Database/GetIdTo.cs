@@ -1,4 +1,6 @@
-﻿namespace Database
+﻿using Database.Entities;
+
+namespace Database
 {
     public static class GetIdTo
     {
