@@ -58,7 +58,6 @@ internal class Program
                     Trace.WriteLine($"{DateTime.Now}\n{source.Number}\n{e.InnerException?.Message}\n");
                 }
             }
-            Console.Clear();
         }
     }
 }
