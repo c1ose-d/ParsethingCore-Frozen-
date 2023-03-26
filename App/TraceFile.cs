@@ -6,8 +6,8 @@ internal static class TraceFile
     {
         FileInfo trace = new("Trace.txt");
         trace.Create().Close();
-        Trace.Listeners.Add(new TextWriterTraceListener(trace.OpenWrite()));
-        Trace.Listeners.Add(new TextWriterTraceListener(Console.Out));
+        _ = Trace.Listeners.Add(new TextWriterTraceListener(trace.OpenWrite()));
+        _ = Trace.Listeners.Add(new TextWriterTraceListener(Console.Out));
         Trace.AutoFlush = true;
     }
 }

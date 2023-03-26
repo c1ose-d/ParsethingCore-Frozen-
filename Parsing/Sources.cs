@@ -7,6 +7,7 @@ public class Sources : List<Source>
         GetSources sources = new();
         foreach (Source source in sources)
         {
+            source.IsGetted = source.GetInnerObjects();
             Add(source);
         }
     }
@@ -21,7 +22,7 @@ public class Sources : List<Source>
             if (Input != null)
             {
                 MatchCollection procurementCards = Regex.Matches(Input);
-                foreach (Match procurementCard in procurementCards)
+                foreach (Match procurementCard in procurementCards.Cast<Match>())
                 {
                     Add(new(procurementCard.Value));
                 }
@@ -32,6 +33,4 @@ public class Sources : List<Source>
         private static RegexOptions RegexOptions { get; } = RegexOptions.Compiled | RegexOptions.Singleline;
         private Regex Regex { get; set; } = new(@" *<div class=""search-registry-entry-block box-shadow-search-input"">(?<val>.*?)\n        </div>", RegexOptions);
     }
-
-    public static string Input { get; set; } = null!;
 }

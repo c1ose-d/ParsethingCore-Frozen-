@@ -7,101 +7,58 @@ internal class Program
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0060:Remove unused parameter", Justification = "<Pending>")]
     public static void Main(string[] args)
     {
+        Console.Title = "Parsething Core";
         TraceFile.Set();
-
-        Sources sources = new();
-        foreach(Source source in sources)
+        Trace.WriteLine($"Session started at {DateTime.Now}.\n");
+        while (true)
         {
-            Console.WriteLine($"{source.RequestUri}\n{source.Number}\n{source.Law?.Number}\n{source.ProcurementSourceStatе?.Kind}\n{source.Object}\n{source.InitialPrice}\n{source.Organization.Name}\n");
+            Sources sources = new();
+            foreach (Source source in sources)
+            {
+                try
+                {
+                    ParsethingContext db = new();
+                    Procurement? def = null;
+                    try
+                    {
+                        def = db.Procurements.Where(p => p.Number == source.Number).First();
+                    }
+                    catch { }
+                    if (def == null)
+                    {
+                        _ = db.Procurements.Add(source);
+                    }
+                    else
+                    {
+                        def.SourceStateId = source.SourceStateId;
+                        def.LawId = source.LawId;
+                        def.Object = source.Object;
+                        def.InitialPrice = source.InitialPrice;
+                        def.OrganizationId = source.OrganizationId;
+                        def.IsSuitable = source.IsSuitable;
+                        if (source.IsGetted == true)
+                        {
+                            def.MethodId = source.MethodId;
+                            def.PlatformId = source.PlatformId;
+                            def.Location = source.Location;
+                            def.StartDate = source.StartDate;
+                            def.Deadline = source.Deadline;
+                            def.TimeZoneId = source.TimeZoneId;
+                            def.Securing = source.Securing;
+                            def.Enforcement = source.Enforcement;
+                            def.Warranty = source.Warranty;
+                        }
+                        _ = db.Procurements.Update(def);
+                    }
+                    _ = db.SaveChanges();
+                    Trace.WriteLine($"{DateTime.Now}\n{source.Number}\nIs saved successfully.\n");
+                }
+                catch (Exception e)
+                {
+                    Trace.WriteLine($"{DateTime.Now}\n{source.Number}\n{e.InnerException?.Message}\n");
+                }
+            }
+            Console.Clear();
         }
-
-        //while (true)
-        //{
-        //    Sources sources = new();
-        //    foreach (Source source in sources)
-        //    {
-        //        try
-        //        {
-        //            ParsethingContext db = new();
-        //            if (source.Number != string.Empty)
-        //            {
-        //                Procurement procurement = SetProcurement(source);
-        //                Procurement? def = null;
-        //                try
-        //                {
-        //                    def = db.Procurements.Where(p => p.Number == procurement.Number).First();
-        //                }
-        //                catch { }
-        //                if (def == null)
-        //                {
-        //                    try
-        //                    {
-        //                        _ = db.Procurements.Add(procurement);
-        //                    }
-        //                    catch { }
-        //                }
-        //                else
-        //                {
-        //                    def.LawId = procurement.LawId;
-        //                    def.MethodId = procurement.MethodId;
-        //                    def.PlatformId = procurement.PlatformId;
-        //                    def.OrganizationId = procurement.OrganizationId;
-        //                    def.Object = procurement.Object;
-        //                    def.Location = procurement.Location;
-        //                    def.StartDate = procurement.StartDate;
-        //                    def.Deadline = procurement.Deadline;
-        //                    def.TimeZoneId = procurement.TimeZoneId;
-        //                    def.InitialPrice = procurement.InitialPrice;
-        //                    def.Securing = procurement.Securing;
-        //                    def.Enforcement = procurement.Enforcement;
-        //                    def.Warranty = procurement.Warranty;
-        //                    _ = db.Procurements.Update(def);
-        //                }
-        //                Trace.WriteLine(procurement.ToString());
-        //                _ = db.SaveChanges();
-        //            }
-        //        }
-        //        catch { }
-        //    }
-        //}
-    }
-
-    private static Procurement SetProcurement(Procurement source)
-    {
-        Procurement procurement = source;
-        if (source.Law != null)
-        {
-            procurement.LawId = GetIdTo.Law(source.Law);
-        }
-        procurement.Law = null;
-        if (source.Method != null)
-        {
-            procurement.MethodId = GetIdTo.Method(source.Method);
-        }
-        else
-        {
-            procurement.MethodId = null;
-        }
-        procurement.Method = null;
-        if (source.Platform != null)
-        {
-            procurement.PlatformId = GetIdTo.Platform(source.Platform);
-        }
-        else
-        {
-            procurement.PlatformId = null;
-        }
-        procurement.Platform = null;
-        if (source.Organization != null)
-        {
-            procurement.OrganizationId = GetIdTo.Organization(source.Organization);
-        }
-        procurement.Organization = null;
-        if (source.TimeZone != null)
-        {
-            procurement.TimeZoneId = GetIdTo.TimeZone(source.TimeZone);
-        }
-        procurement.TimeZone = null;
-        return procurement;
     }
 }

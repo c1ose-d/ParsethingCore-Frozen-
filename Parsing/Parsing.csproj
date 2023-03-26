@@ -21,6 +21,7 @@
 
   <ItemGroup>
     <Using Include="Database" />
+    <Using Include="Database.Entities" />
     <Using Include="Parsing.Properties" />
     <Using Include="System.Diagnostics" />
     <Using Include="System.Text" />

@@ -7,8 +7,8 @@ public partial class Procurement
     public string RequestUri { get; set; } = null!;
 
     public string Number { get; set; } = null!;
-    
-    public string ProcurementSourceStateId { get; set; } = null!;
+
+    public int SourceStateId { get; set; }
 
     public int LawId { get; set; }
 
@@ -22,13 +22,13 @@ public partial class Procurement
 
     public int? PlatformId { get; set; }
 
-    public string Location { get; set; } = null!;
+    public string? Location { get; set; }
 
     public DateTime? StartDate { get; set; }
 
     public DateTime? Deadline { get; set; }
 
-    public int TimeZoneId { get; set; }
+    public int? TimeZoneId { get; set; }
 
     public string? Securing { get; set; }
 
@@ -36,7 +36,7 @@ public partial class Procurement
 
     public string? Warranty { get; set; }
 
-    public virtual ProcurementSourceStatе? ProcurementSourceStatе { get; set; }
+    public bool IsSuitable { get; set; }
 
     public virtual Law? Law { get; set; }
 
@@ -46,5 +46,46 @@ public partial class Procurement
 
     public virtual Platform? Platform { get; set; }
 
+    public virtual SourceStatе? SourceState { get; set; }
+
     public virtual TimeZone? TimeZone { get; set; }
+
+    public void SetForeignKeys()
+    {
+        if (Law != null)
+        {
+            LawId = GetIdTo.Law(Law);
+        }
+        Law = null;
+
+        if (Method != null)
+        {
+            MethodId = GetIdTo.Method(Method);
+        }
+        Method = null;
+
+        if (Organization != null)
+        {
+            OrganizationId = GetIdTo.Organization(Organization);
+        }
+        Organization = null;
+
+        if (Platform != null)
+        {
+            PlatformId = GetIdTo.Platform(Platform);
+        }
+        Platform = null;
+
+        if (SourceState != null)
+        {
+            SourceStateId = GetIdTo.SourceState(SourceState);
+        }
+        SourceState = null;
+
+        if (TimeZone != null)
+        {
+            TimeZoneId = GetIdTo.TimeZone(TimeZone);
+        }
+        TimeZone = null;
+    }
 }

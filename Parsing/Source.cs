@@ -1,6 +1,4 @@
-﻿using Database.Entities;
-
-namespace Parsing;
+﻿namespace Parsing;
 
 public class Source : Procurement
 {
@@ -11,28 +9,85 @@ public class Source : Procurement
     }
 
     public static string ProcurementCard { get; set; } = null!;
-    public static string Input { get; set; } = null!;
+    public static string Input { get; set; } = string.Empty;
+    public bool IsGetted { get; set; }
 
     private void Initialize()
     {
         RequestUri = $"https://zakupki.gov.ru/epz/order/notice{new GetRequestUri().Result}";
         Number = new GetNumber().Result;
-        ProcurementSourceStatе = new() { Kind = new GetProcurementSourceStateKind().Result };
+        SourceState = new() { Kind = new GetProcurementSourceStateKind().Result };
         Law = new() { Number = new GetLawNumber().Result };
         Object = new GetObject().Result;
         InitialPrice = Convert.ToDecimal(new GetInitialPrice().Result);
         Organization = new() { Name = new GetOrganizationName().Result };
     }
 
-    public void GetInnerObjects()
-    {
-        GetInput();
-    }
-
     private void GetInput()
     {
         GetRequest request = new(RequestUri);
         Input = request.Input;
+    }
+
+    public bool GetInnerObjects()
+    {
+        GetInput();
+        if (Input != string.Empty)
+        {
+            Method = new() { Text = new GetMethodText().Result };
+            Platform = new() { Name = new GetPlatformName().Result, Address = new GetPlatformAddress().Result };
+            if (Organization != null)
+            {
+                Organization.PostalAddress = new GetOrganizationPostalAddress().Result;
+            }
+            Location = new GetLocation().Result;
+            StartDate = Convert.ToDateTime(new GetStartDate().Result);
+            Deadline = Convert.ToDateTime(new GetDeadline().Result);
+            TimeZone = new() { Offset = new GetTimeZoneOffset().Result };
+            Securing = new GetSecuring().Result;
+            if (Securing == "")
+            {
+                Securing = null;
+            }
+            Enforcement = new GetEnforcement().Result;
+            if (Enforcement == "")
+            {
+                Enforcement = null;
+            }
+            Warranty = new GetWarranty().Result;
+            if (Warranty == "")
+            {
+                Warranty = null;
+            }
+            SetIsSuitable();
+            SetForeignKeys();
+            return true;
+        }
+        else
+        {
+            SetIsSuitable();
+            SetForeignKeys();
+            return false;
+        }
+    }
+
+    public void SetIsSuitable()
+    {
+        using ParsethingContext db = new();
+        bool sourceState = false, tagged = false;
+        if (SourceState?.Kind == "Подача заявок")
+        {
+            sourceState = true;
+        }
+        foreach (Tag tag in db.Tags)
+        {
+            if (Object.ToLower().Contains(tag.Keyword))
+            {
+                tagged = true;
+                break;
+            }
+        }
+        IsSuitable = sourceState && tagged;
     }
 
     private class GetRequestUri : Parse
@@ -43,7 +98,7 @@ public class Source : Procurement
 
     private class GetNumber : Parse
     {
-        public override List<Regex> Regexes { get; } = new() { new(@"№ (?<val>.*?)\n", RegexOptions) };
+        public override List<Regex> Regexes { get; } = new() { new(@"<a target=""_blank"" href=""/epz/order/notice(?<space>.*?)"">\n *№ (?<val>.*?)\n", RegexOptions) };
         public GetNumber() : base(ProcurementCard) { }
     }
 
@@ -141,10 +196,5 @@ public class Source : Procurement
     {
         public override List<Regex> Regexes { get; } = new() { new(@"Размер обеспечения гарантийных обязательств</(?<space>.*?)>\n *<(?<space>.*?)>\n *(?<val>.*?)\n", RegexOptions) };
         public GetWarranty() : base(Input) { }
-    }
-
-    public override string ToString()
-    {
-        return $"{RequestUri}\n{Number}\n{Object}\n{Location}\n{TimeZone?.Offset}\n{InitialPrice}";
     }
 }

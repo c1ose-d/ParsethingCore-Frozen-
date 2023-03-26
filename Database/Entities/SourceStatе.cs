@@ -1,6 +1,6 @@
 ﻿namespace Database.Entities;
 
-public class ProcurementSourceStatе
+public partial class SourceStatе
 {
     public int Id { get; set; }
 
