@@ -25,7 +25,7 @@ public class Parse
 
     public static RegexOptions RegexOptions { get; } = RegexOptions.Compiled | RegexOptions.Singleline;
     public virtual List<Regex> Regexes { get; } = null!;
-    private Dictionary<string, string> Replacements { get; } = new() { { "«", "\"" }, { "»", "\"" }, { "&nbsp;", " " }, { "&#8381;", "Российский рубль" }, { "&#034;", "\"" }, { "\n", "" }, { "&ndash;", "—" }, { "&laquo;", "\"" }, { "&raquo;", "\n" } };
+    private Dictionary<string, string> Replacements { get; } = new() { { "«", "\"" }, { "»", "\"" }, { "&nbsp;", " " }, { "&#8381;", "Российский рубль" }, { "&#034;", "\"" }, { "\n", "" }, { "&ndash;", "—" }, { "&laquo;", "\"" }, { "&raquo;", "\"" }, { "&quot;", "\"" } };
     private void RemoveWhitespace()
     {
         if (Result != null)
