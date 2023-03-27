@@ -1,13 +1,10 @@
-﻿using Database.Entities;
-
-namespace App;
+﻿namespace ParsethingCore;
 
 internal class Program
 {
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0060:Remove unused parameter", Justification = "<Pending>")]
     public static void Main(string[] args)
     {
-        Console.Title = "Parsething Core";
+        Console.Title = Resources.Title;
         TraceFile.Set();
         Trace.WriteLine($"Session started at {DateTime.Now}.\n");
         while (true)

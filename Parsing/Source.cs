@@ -17,13 +17,20 @@ public class Source : Procurement
     private void Initialize()
     {
         RequestUri = $"https://zakupki.gov.ru/epz/order/notice{new GetRequestUri().Result}";
-        Number = new GetNumber().Result;
-        Law = new() { Number = new GetLawNumber().Result };
-        Object = new GetObject().Result;
-        InitialPrice = Convert.ToDecimal(new GetInitialPrice().Result);
-        Organization = new() { Name = new GetOrganizationName().Result };
-        SourceState = new GetSourceState().Result;
-        SetIsSkippable();
+        try
+        {
+            Number = new GetNumber().Result;
+            Law = new() { Number = new GetLawNumber().Result };
+            Object = new GetObject().Result;
+            InitialPrice = Convert.ToDecimal(new GetInitialPrice().Result);
+            Organization = new() { Name = new GetOrganizationName().Result };
+            SourceState = new GetSourceState().Result;
+            SetIsSkippable();
+        }
+        catch
+        {
+            IsSkippable = true;
+        }
     }
 
     private void GetInput()

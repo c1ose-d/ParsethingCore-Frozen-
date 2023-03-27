@@ -1,4 +1,4 @@
-﻿namespace App;
+﻿namespace ParsethingCore;
 
 internal static class TraceFile
 {
