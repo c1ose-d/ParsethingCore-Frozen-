@@ -7,8 +7,15 @@ public class Sources : List<Source>
         GetSources sources = new();
         foreach (Source source in sources)
         {
-            source.IsGetted = source.GetInnerObjects();
-            Add(source);
+            if (!source.IsSkippable)
+            {
+                source.GetInnerObjects();
+                Add(source);
+            }
+            else
+            {
+                Trace.WriteLine($"{DateTime.Now}\n{source.Number}\nIs skiped.\n");
+            }
         }
     }
 

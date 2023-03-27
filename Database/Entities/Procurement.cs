@@ -8,8 +8,6 @@ public partial class Procurement
 
     public string Number { get; set; } = null!;
 
-    public int SourceStateId { get; set; }
-
     public int LawId { get; set; }
 
     public string Object { get; set; } = null!;
@@ -36,8 +34,6 @@ public partial class Procurement
 
     public string? Warranty { get; set; }
 
-    public bool IsSuitable { get; set; }
-
     public virtual Law? Law { get; set; }
 
     public virtual Method? Method { get; set; }
@@ -45,8 +41,6 @@ public partial class Procurement
     public virtual Organization? Organization { get; set; }
 
     public virtual Platform? Platform { get; set; }
-
-    public virtual SourceStatе? SourceState { get; set; }
 
     public virtual TimeZone? TimeZone { get; set; }
 
@@ -75,12 +69,6 @@ public partial class Procurement
             PlatformId = GetIdTo.Platform(Platform);
         }
         Platform = null;
-
-        if (SourceState != null)
-        {
-            SourceStateId = GetIdTo.SourceState(SourceState);
-        }
-        SourceState = null;
 
         if (TimeZone != null)
         {

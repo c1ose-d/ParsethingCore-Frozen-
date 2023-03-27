@@ -14,8 +14,6 @@ public partial class ParsethingContext : DbContext
 
     public virtual DbSet<Procurement> Procurements { get; set; }
 
-    public virtual DbSet<SourceStatе> SourceStatеs { get; set; }
-
     public virtual DbSet<Tag> Tags { get; set; }
 
     public virtual DbSet<TimeZone> TimeZones { get; set; }

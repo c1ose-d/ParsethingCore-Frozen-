@@ -61,28 +61,28 @@ public static class GetIdTo
         if (organization != null)
         {
             Organization? def = null;
-            if (organization.PostalAddress != null)
+
+            try
             {
-                try
-                {
-                    def = db.Organizations.Where(o => o.Name == organization.Name).Where(o => o.PostalAddress == organization.PostalAddress).First();
-                }
-                catch { }
+                def = db.Organizations.Where(o => o.Name == organization.Name).First();
             }
-            else
-            {
-                try
-                {
-                    def = db.Organizations.Where(o => o.Name == organization.Name).First();
-                }
-                catch { }
-            }
+            catch { }
             if (def != null)
             {
+                if (organization.PostalAddress != string.Empty)
+                {
+                    def.PostalAddress = organization.PostalAddress;
+                }
+                _ = db.Organizations.Update(def);
+                _ = db.SaveChanges();
                 id = def.Id;
             }
             else
             {
+                if (organization.PostalAddress != string.Empty)
+                {
+                    organization.PostalAddress = null;
+                }
                 _ = db.Organizations.Add(organization);
                 _ = db.SaveChanges();
                 id = db.Organizations.Where(o => o.Name == organization.Name).Where(o => o.PostalAddress == organization.PostalAddress).First().Id;
@@ -112,32 +112,6 @@ public static class GetIdTo
                 _ = db.Platforms.Add(platform);
                 _ = db.SaveChanges();
                 id = db.Platforms.Where(p => p.Name == platform.Name).Where(p => p.Address == platform.Address).First().Id;
-            }
-        }
-        return id;
-    }
-
-    public static int SourceState(SourceStatе sourceStatе)
-    {
-        using ParsethingContext db = new();
-        int id = 0;
-        if (sourceStatе != null)
-        {
-            SourceStatе? def = null;
-            try
-            {
-                def = db.SourceStatеs.Where(pss => pss.Kind == sourceStatе.Kind).First();
-            }
-            catch { }
-            if (def != null)
-            {
-                id = def.Id;
-            }
-            else
-            {
-                _ = db.SourceStatеs.Add(sourceStatе);
-                _ = db.SaveChanges();
-                id = db.SourceStatеs.Where(pss => pss.Kind == sourceStatе.Kind).First().Id;
             }
         }
         return id;

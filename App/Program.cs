@@ -30,13 +30,11 @@ internal class Program
                     }
                     else
                     {
-                        def.SourceStateId = source.SourceStateId;
                         def.LawId = source.LawId;
                         def.Object = source.Object;
                         def.InitialPrice = source.InitialPrice;
                         def.OrganizationId = source.OrganizationId;
-                        def.IsSuitable = source.IsSuitable;
-                        if (source.IsGetted == true)
+                        if (source.IsGetted)
                         {
                             def.MethodId = source.MethodId;
                             def.PlatformId = source.PlatformId;

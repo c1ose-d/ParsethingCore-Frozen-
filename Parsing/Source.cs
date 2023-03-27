@@ -8,19 +8,22 @@ public class Source : Procurement
         Initialize();
     }
 
-    public static string ProcurementCard { get; set; } = null!;
-    public static string Input { get; set; } = string.Empty;
-    public bool IsGetted { get; set; }
+    private static string ProcurementCard { get; set; } = null!;
+    private static string Input { get; set; } = string.Empty;
+    private string SourceState { get; set; } = string.Empty;
+    public bool IsSkippable { get; set; }
+    public bool IsGetted { get; set; } = false;
 
     private void Initialize()
     {
         RequestUri = $"https://zakupki.gov.ru/epz/order/notice{new GetRequestUri().Result}";
         Number = new GetNumber().Result;
-        SourceState = new() { Kind = new GetProcurementSourceStateKind().Result };
         Law = new() { Number = new GetLawNumber().Result };
         Object = new GetObject().Result;
         InitialPrice = Convert.ToDecimal(new GetInitialPrice().Result);
         Organization = new() { Name = new GetOrganizationName().Result };
+        SourceState = new GetSourceState().Result;
+        SetIsSkippable();
     }
 
     private void GetInput()
@@ -29,7 +32,7 @@ public class Source : Procurement
         Input = request.Input;
     }
 
-    public bool GetInnerObjects()
+    public void GetInnerObjects()
     {
         GetInput();
         if (Input != string.Empty)
@@ -41,8 +44,22 @@ public class Source : Procurement
                 Organization.PostalAddress = new GetOrganizationPostalAddress().Result;
             }
             Location = new GetLocation().Result;
-            StartDate = Convert.ToDateTime(new GetStartDate().Result);
-            Deadline = Convert.ToDateTime(new GetDeadline().Result);
+            try
+            {
+                StartDate = Convert.ToDateTime(new GetStartDate().Result);
+            }
+            catch
+            {
+                StartDate = null;
+            }
+            try
+            {
+                Deadline = Convert.ToDateTime(new GetDeadline().Result);
+            }
+            catch
+            {
+                StartDate = null;
+            }
             TimeZone = new() { Offset = new GetTimeZoneOffset().Result };
             Securing = new GetSecuring().Result;
             if (Securing == "")
@@ -59,35 +76,32 @@ public class Source : Procurement
             {
                 Warranty = null;
             }
-            SetIsSuitable();
-            SetForeignKeys();
-            return true;
+            IsGetted = true;
         }
-        else
-        {
-            SetIsSuitable();
-            SetForeignKeys();
-            return false;
-        }
+        SetForeignKeys();
     }
 
-    public void SetIsSuitable()
+    public void SetIsSkippable()
     {
         using ParsethingContext db = new();
-        bool sourceState = false, tagged = false;
-        if (SourceState?.Kind == "Подача заявок")
+        bool isNotRequiredSourceState = true, IsNotTagged = true;
+        if (SourceState == "Подача заявок")
         {
-            sourceState = true;
+            isNotRequiredSourceState = false;
         }
-        foreach (Tag tag in db.Tags)
+        if (!isNotRequiredSourceState)
         {
-            if (Object.ToLower().Contains(tag.Keyword))
+            foreach (Tag tag in db.Tags)
             {
-                tagged = true;
-                break;
+                if (Object.ToLower().Contains(tag.Keyword))
+                {
+                    IsNotTagged = false;
+                    Trace.WriteLine($"{DateTime.Now}\n{Number}\nTag {tag.Keyword} is found. SourceState = {SourceState}.\n");
+                    break;
+                }
             }
         }
-        IsSuitable = sourceState && tagged;
+        IsSkippable = isNotRequiredSourceState || IsNotTagged;
     }
 
     private class GetRequestUri : Parse
@@ -102,10 +116,10 @@ public class Source : Procurement
         public GetNumber() : base(ProcurementCard) { }
     }
 
-    private class GetProcurementSourceStateKind : Parse
+    private class GetSourceState : Parse
     {
         public override List<Regex> Regexes { get; } = new() { new(@"<div class=""registry-entry__header-mid__title text-normal"">(?<val>.*?)</div>", RegexOptions) };
-        public GetProcurementSourceStateKind() : base(ProcurementCard) { }
+        public GetSourceState() : base(ProcurementCard) { }
     }
 
     private class GetLawNumber : Parse
