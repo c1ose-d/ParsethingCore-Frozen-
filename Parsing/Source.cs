@@ -77,8 +77,9 @@ public class Source : Procurement
                 Warranty = null;
             }
             IsGetted = true;
+            SetNullableForeignKeys();
         }
-        SetForeignKeys();
+        SetNotNullableForeignKeys();
     }
 
     public void SetIsSkippable()

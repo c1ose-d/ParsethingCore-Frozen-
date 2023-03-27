@@ -44,7 +44,7 @@ public partial class Procurement
 
     public virtual TimeZone? TimeZone { get; set; }
 
-    public void SetForeignKeys()
+    public void SetNotNullableForeignKeys()
     {
         if (Law != null)
         {
@@ -52,17 +52,20 @@ public partial class Procurement
         }
         Law = null;
 
-        if (Method != null)
-        {
-            MethodId = GetIdTo.Method(Method);
-        }
-        Method = null;
-
         if (Organization != null)
         {
             OrganizationId = GetIdTo.Organization(Organization);
         }
         Organization = null;
+    }
+
+    public void SetNullableForeignKeys()
+    {
+        if (Method != null)
+        {
+            MethodId = GetIdTo.Method(Method);
+        }
+        Method = null;
 
         if (Platform != null)
         {
