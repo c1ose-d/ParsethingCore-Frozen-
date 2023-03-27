@@ -3,11 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.6.33513.286
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Database", "Database\Database.csproj", "{A009917E-EBC7-4404-9466-AD3E6EFD2F67}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Database", "Database\Database.csproj", "{A009917E-EBC7-4404-9466-AD3E6EFD2F67}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Parsing", "Parsing\Parsing.csproj", "{1250B50D-F7E1-4AC0-882E-C148BEBFA1B9}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Parsing", "Parsing\Parsing.csproj", "{1250B50D-F7E1-4AC0-882E-C148BEBFA1B9}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "App", "App\App.csproj", "{643ED8C1-080B-4813-9495-27586605198A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ParsethingCore", "App\ParsethingCore.csproj", "{643ED8C1-080B-4813-9495-27586605198A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

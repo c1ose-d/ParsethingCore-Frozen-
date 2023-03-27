@@ -13,7 +13,7 @@ public class Parse
                 {
                     Result = Result.Replace(replacement.Key, replacement.Value);
                 }
-                if (Result != null)
+                if (Result != string.Empty)
                 {
                     RemoveWhitespace();
                     break;

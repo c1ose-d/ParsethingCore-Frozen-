@@ -143,13 +143,13 @@ public class Source : Procurement
 
     private class GetOrganizationName : Parse
     {
-        public override List<Regex> Regexes { get; } = new() { new(@"href=""/epz/organization/view/(?<space>.*?)>\n *(?<val>.*?)\n", RegexOptions) };
+        public override List<Regex> Regexes { get; } = new() { new(@"href=""/epz/organization/view(?<space>.*?)>\n *(?<val>.*?)\n", RegexOptions) };
         public GetOrganizationName() : base(ProcurementCard) { }
     }
 
     private class GetMethodText : Parse
     {
-        public override List<Regex> Regexes { get; } = new() { new(@"<div class=""col-9 p-0 registry-entry__header-top__title text-truncate""(?<space>.*?)>\n *(?<space>.*?)\n *(?<val>.*?)\n", RegexOptions) };
+        public override List<Regex> Regexes { get; } = new() { new(@"<div class=""col-9 p-0 registry-entry__header-top__title text-truncate""(?<space>.*?)>\n *(?<space>.*?)\n *(?<val>.*?)\n", RegexOptions), new(@"Способ осуществления закупки</(?<space>.*?)>\n(?<space>.*?)>\n *(?<val>.*?)\n", RegexOptions) };
         public GetMethodText() : base(Input) { }
     }
 
