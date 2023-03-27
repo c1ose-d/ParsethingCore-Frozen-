@@ -7,7 +7,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Database", "Database\Databa
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Parsing", "Parsing\Parsing.csproj", "{1250B50D-F7E1-4AC0-882E-C148BEBFA1B9}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ParsethingCore", "App\ParsethingCore.csproj", "{643ED8C1-080B-4813-9495-27586605198A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ParsethingCore", "ParsethingCore\ParsethingCore.csproj", "{643ED8C1-080B-4813-9495-27586605198A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
