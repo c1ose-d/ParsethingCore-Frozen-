@@ -5,25 +5,21 @@ public class GetRequest
     public GetRequest(string requestUri)
     {
         RequestUri = requestUri;
-        HttpClient = new HttpClient()
-        {
-            Timeout = TimeSpan.FromSeconds(10)
-        };
-
-        try
-        {
-            Input = HttpClient.GetStringAsync(RequestUri).Result;
-            Trace.WriteLine($"{DateTime.Now}\n{RequestUri}\nIs complited successfully.\n");
-        }
-        catch (Exception e)
-        {
-            Trace.WriteLine($"{DateTime.Now}\n{RequestUri}\n{e.InnerException?.Message}\n");
-        }
-
-        HttpClient.Dispose();
+        GetRequestAsync().Wait();
     }
 
     private string RequestUri { get; set; } = null!;
-    private HttpClient HttpClient { get; set; }
     public string Input { get; set; } = string.Empty;
+
+    private async Task GetRequestAsync()
+    {
+        using HttpClient httpClient = new()
+        {
+            Timeout = TimeSpan.FromSeconds(5)
+        };
+        using HttpResponseMessage httpResponseMessage = await httpClient.GetAsync(RequestUri);
+        using HttpContent httpContent = httpResponseMessage.Content;
+        Input = await httpContent.ReadAsStringAsync();
+        Trace.WriteLine($"{RequestUri} status code is {httpResponseMessage.StatusCode}.");
+    }
 }
